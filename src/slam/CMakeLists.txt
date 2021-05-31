@@ -210,4 +210,4 @@ include_directories(
 # catkin_add_nosetests(test)
 add_executable(slam_node src/slam_node.cpp)
 target_link_libraries(slam_node ${catkin_LIBRARIES})
-add_dependencies(slam_node slam_generate_messages_cpp)
+add_dependencies(slam_node apriltag_ros_generate_messages_cpp)
