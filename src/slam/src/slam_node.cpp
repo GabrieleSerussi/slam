@@ -7,6 +7,8 @@
 #include <math.h>
 #include <apriltag_ros/AprilTagDetectionArray.h>
 #include <set>
+#include <Eigen/Geometry>
+//#include <Eigen/Core>
 
 std::vector<float> current(3,0);
 std::vector<float> old(3,0);
@@ -78,12 +80,23 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
       int i=1000000000;
       tf2_ros::Buffer tfBuffer;
       tf2_ros::TransformListener tfListener(tfBuffer);
+      Eigen::Transform<float,3,Affine,AutoAlign> t;
       while (i>=0){
         try{
           // DA GUARDARE
           transformStamped = tfBuffer.lookupTransform("odom","fisheye_rect", ros::Time(0));
-          float xw = msg->detections[0].pose.pose.pose.position.x + transformStamped.transform.translation.x;
-          float yw = msg->detections[0].pose.pose.pose.position.y + transformStamped.transform.translation.y;
+          t.translation() << msg->detections[0].pose.pose.pose.position.x, msg->detections[0].pose.pose.pose.position.y, msg->detections[0].pose.pose.pose.position.z;
+          tf2::Quaternion q(msg->pose.pose.pose.orientation.x, msg->pose.pose.pose.orientation.y, msg->pose.pose.pose.orientation.z, msg->pose.pose.orientation.w);
+          tf2::Matrix3x3 m(q);
+          double roll, pitch, yaw;
+          m.getRPY(roll, pitch, yaw);
+          t.rotate(AngleAxis(yaw, Vector3f::UnitX()));
+          // float c = cos(); float s = sin();
+          // t.linear() = c, -s, s,  c;
+          Eigen::Vector3f point; point << transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z;
+          Eigen::Vector3f pointw = t*point;
+          float xw = pointw.x();
+          float yw = pointw.y();
           ROS_INFO("VERTEX_XY %d %f %f", new_tag_id, xw ,yw);
           break;
         }
