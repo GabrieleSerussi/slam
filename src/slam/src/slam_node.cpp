@@ -61,6 +61,7 @@ int main(int argc, char** argv){
     try{
       transformStamped = tfBuffer.lookupTransform("odom", "fisheye_rect",
                                ros::Time(0));
+      ROS_INFO("VERTEX_XY %d %f %f",tag_id, transformStamped.transform.translation.x,transformStamped.transform.translation.y);
     }
     catch (tf2::TransformException &ex) {
       ROS_WARN("%s",ex.what());
@@ -68,7 +69,7 @@ int main(int argc, char** argv){
       continue;
     }
 
-    ROS_INFO("VERTEX_XY %d %f %f",tag_id, transformStamped.transform.translation.x,transformStamped.transform.translation.y);
+    
    rate.sleep();
   }
   return 0;
