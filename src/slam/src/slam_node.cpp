@@ -80,8 +80,8 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
       tf2_ros::TransformListener tfListener(tfBuffer);
       while (i>=0){
         try{
-          transformStamped = tfBuffer.lookupTransform("odom", "fisheye_rect",
-                                  ros::Time(0));
+          // DA GUARDARE
+          transformStamped = tfBuffer.lookupTransform("odom","fisheye_rect", ros::Time(0));
           float xw = msg->detections[0].pose.pose.pose.position.x + transformStamped.transform.translation.x;
           float yw = msg->detections[0].pose.pose.pose.position.y + transformStamped.transform.translation.y;
           ROS_INFO("VERTEX_XY %d %f %f", new_tag_id, xw ,yw);
