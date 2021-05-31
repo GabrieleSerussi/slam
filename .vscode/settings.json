@@ -1,0 +1,25 @@
+{
+    "files.associations": {
+        "__hash_table": "cpp",
+        "__string": "cpp",
+        "algorithm": "cpp",
+        "array": "cpp",
+        "atomic": "cpp",
+        "bitset": "cpp",
+        "cstdio": "cpp",
+        "cstdlib": "cpp",
+        "cstring": "cpp",
+        "cwchar": "cpp",
+        "memory_resource": "cpp",
+        "istream": "cpp",
+        "iterator": "cpp",
+        "memory": "cpp",
+        "ostream": "cpp",
+        "streambuf": "cpp",
+        "string": "cpp",
+        "string_view": "cpp",
+        "type_traits": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp"
+    }
+}

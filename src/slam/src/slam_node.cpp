@@ -14,7 +14,6 @@ int id=1000;
 int tag_id=-1;
 int new_tag_id=-2;
 std::set<int> tags;
-ros::NodeHandle n;
 tf2_ros::Buffer tfBuffer;
 tf2_ros::TransformListener tfListener(tfBuffer);
 geometry_msgs::TransformStamped transformStamped;
@@ -83,7 +82,8 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
         tags.insert(new_tag_id);
         tag_id = new_tag_id;
         ROS_INFO("EDGE_SE2_XY %d %d %f %f", id, tag_id, msg->detections[0].pose.pose.pose.position.x, msg->detections[0].pose.pose.pose.position.y);
-        while (n.ok()){
+        int i=1000000000;
+        while (i>=0){
           try{
             transformStamped = tfBuffer.lookupTransform("odom", "fisheye_rect",
                                     ros::Time(0));
@@ -93,8 +93,8 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
           catch (tf2::TransformException &ex) {
             ROS_WARN("%s",ex.what());
             ros::Duration(1.0).sleep();
-            continue;
-          } 
+          }
+          i--; 
         }
     }
   }
@@ -102,7 +102,7 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
 // voglio la trasformata da fisheye_rect a odom
 int main(int argc, char** argv){
   ros::init(argc, argv, "slam_node");
-
+  ros::NodeHandle n;
   
 
   ros::Subscriber sub_odom = n.subscribe("odom", 1000, odometryCallback);
