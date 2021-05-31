@@ -18,10 +18,10 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 
- list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+#list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # include_directories(${Eigen_INCLUDE_DIRS})
 # find_package(Eigen REQUIRED)
-include_directories(${Eigen_INCLUDE_DIRS})
+#include_directories(${Eigen_INCLUDE_DIRS})
 find_package(Eigen REQUIRED)
 
 ## System dependencies are found with CMake's conventions
