@@ -6,11 +6,21 @@
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <math.h>
 #include <apriltag_ros/AprilTagDetectionArray.h>
+#include <set>
 
 std::vector<float> current(3,0);
 std::vector<float> old(3,0);
 int id=1000;
 int tag_id=-1;
+int new_tag_id=-2;
+std::set<int, greater<int>> tags;
+ros::NodeHandle n;
+tf2_ros::Buffer tfBuffer;
+tf2_ros::TransformListener tfListener(tfBuffer);
+geometry_msgs::TransformStamped transformStamped;
+
+ 
+
 
 void odometryCallback(const nav_msgs::Odometry::ConstPtr msg) {
   
@@ -68,36 +78,40 @@ apriltag_ros/AprilTagDetection[] detections
 */
 void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
   if (!msg->detections.empty()){
-    tag_id = msg->detections[0].id[0];
-    ROS_INFO("EDGE_SE2_XY %d %d %f %f", id, tag_id, msg->detections[0].pose.pose.pose.position.x, msg->detections[0].pose.pose.pose.position.y);
+    new_tag_id = msg->detections[0].id[0];
+    if(!tags.count(new_tag_id)){
+        tags.insert(new_tag_id);
+        tag_id = new_tag_id;
+        ROS_INFO("EDGE_SE2_XY %d %d %f %f", id, tag_id, msg->detections[0].pose.pose.pose.position.x, msg->detections[0].pose.pose.pose.position.y);
+        while (n.ok()){
+          try{
+            transformStamped = tfBuffer.lookupTransform("odom", "fisheye_rect",
+                                    ros::Time(0));
+            ROS_INFO("VERTEX_XY %d %f %f",tag_id, transformStamped.transform.translation.x,transformStamped.transform.translation.y);
+            break;
+          }
+          catch (tf2::TransformException &ex) {
+            ROS_WARN("%s",ex.what());
+            ros::Duration(1.0).sleep();
+            continue;
+          } 
+        }
+    }
   }
 }
 // voglio la trasformata da fisheye_rect a odom
 int main(int argc, char** argv){
   ros::init(argc, argv, "slam_node");
 
-  ros::NodeHandle n;
+  
 
   ros::Subscriber sub_odom = n.subscribe("odom", 1000, odometryCallback);
   ros::Subscriber sub_tag = n.subscribe("tag_detections", 1000, tagCallback);
 
-  tf2_ros::Buffer tfBuffer;
-  tf2_ros::TransformListener tfListener(tfBuffer);
-
-  ros::Rate rate(10.0);
+   ros::Rate rate(10.0);
   while (n.ok()){
     ros::spinOnce();
-    geometry_msgs::TransformStamped transformStamped;
-    try{
-      transformStamped = tfBuffer.lookupTransform("odom", "fisheye_rect",
-                               ros::Time(0));
-      ROS_INFO("VERTEX_XY %d %f %f",tag_id, transformStamped.transform.translation.x,transformStamped.transform.translation.y);
-    }
-    catch (tf2::TransformException &ex) {
-      ROS_WARN("%s",ex.what());
-      ros::Duration(1.0).sleep();
-      continue;
-    }
+    
 
     
    rate.sleep();
