@@ -71,30 +71,30 @@ apriltag_ros/AprilTagDetection[] detections
       float64[36] covariance
 */
 void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
-  if (!msg->detections.empty()){
+  if (!msg->detections.empty()){  
+    // RICORDATI DI FARE UN CICLO SUGLI ID
     new_tag_id = msg->detections[0].id[0];
     if(!tags.count(new_tag_id)){
-        tags.insert(new_tag_id);
-        tag_id = new_tag_id;
-        ROS_INFO("EDGE_SE2_XY %d %d %f %f", id, tag_id, msg->detections[0].pose.pose.pose.position.x, msg->detections[0].pose.pose.pose.position.y);
-        
-        int i=1000000000;
-        tf2_ros::Buffer tfBuffer;
-        tf2_ros::TransformListener tfListener(tfBuffer);
-        while (i>=0){
-          try{
-            transformStamped = tfBuffer.lookupTransform("odom", "fisheye_rect",
-                                    ros::Time(0));
-            ROS_INFO("VERTEX_XY %d %f %f",tag_id, transformStamped.transform.translation.x,transformStamped.transform.translation.y);
-            break;
-          }
-          catch (tf2::TransformException &ex) {
-            ROS_WARN("%s",ex.what());
-            ros::Duration(1.0).sleep();
-          }
-          i--; 
+      int i=1000000000;
+      tf2_ros::Buffer tfBuffer;
+      tf2_ros::TransformListener tfListener(tfBuffer);
+      while (i>=0){
+        try{
+          transformStamped = tfBuffer.lookupTransform("odom", "fisheye_rect",
+                                  ros::Time(0));
+          ROS_INFO("VERTEX_XY %d %f %f",new_tag_id, transformStamped.transform.translation.x,transformStamped.transform.translation.y);
+          break;
         }
+        catch (tf2::TransformException &ex) {
+          ROS_WARN("%s",ex.what());
+          ros::Duration(1.0).sleep();
+        }
+        i--; 
+      }
+      tags.insert(new_tag_id);
     }
+    tag_id = new_tag_id;
+    ROS_INFO("EDGE_SE2_XY %d %d %f %f", id, tag_id, msg->detections[0].pose.pose.pose.position.x, msg->detections[0].pose.pose.pose.position.y); 
   }
 }
 // voglio la trasformata da fisheye_rect a odom
