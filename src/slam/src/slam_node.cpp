@@ -5,12 +5,14 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <math.h>
+#include <apriltag_ros/AprilTagDetection.h>
 
 std::vector<float> current(3,0);
 std::vector<float> old(3,0);
 int id=1000;
+int tag_id=-1;
 
-void odometryCallback_(const nav_msgs::Odometry::ConstPtr msg) {
+void odometryCallback(const nav_msgs::Odometry::ConstPtr msg) {
   
   tf2::Quaternion q(msg->pose.pose.orientation.x, msg->pose.pose.orientation.y, msg->pose.pose.orientation.z, msg->pose.pose.orientation.w);
   tf2::Matrix3x3 m(q);
@@ -36,13 +38,18 @@ void odometryCallback_(const nav_msgs::Odometry::ConstPtr msg) {
     }
   }
 }
-
+void tagCallback(const apriltag_ros::AprilTagDetection::ConstPtr msg) {
+  tag_id = msg->id[0];
+  ROS_INFO("EDGE_SE2_XY %d %d %f %f", id, tag_id, msg->pose.pose.pose.position.x, msg->pose.pose.pose.position.y);
+}
+// voglio la trasformata da fisheye_rect a odom
 int main(int argc, char** argv){
   ros::init(argc, argv, "slam_node");
 
   ros::NodeHandle n;
 
-  ros::Subscriber sub = n.subscribe("odom", 1000, odometryCallback_);
+  ros::Subscriber sub_odom = n.subscribe("odom", 1000, odometryCallback);
+  ros::Subsscriber sub_tag = n.subscribe("tag_detections", 1000, tagCallback);
 
   tf2_ros::Buffer tfBuffer;
   tf2_ros::TransformListener tfListener(tfBuffer);
@@ -52,7 +59,7 @@ int main(int argc, char** argv){
     ros::spinOnce();
     geometry_msgs::TransformStamped transformStamped;
     try{
-      transformStamped = tfBuffer.lookupTransform("odom", "base_link",
+      transformStamped = tfBuffer.lookupTransform("odom", "fisheye_rect",
                                ros::Time(0));
     }
     catch (tf2::TransformException &ex) {
@@ -61,8 +68,8 @@ int main(int argc, char** argv){
       continue;
     }
 
-    //ROS_INFO("Prova: [%f,%f]",transformStamped.transform.translation.x,transformStamped.transform.translation.y);
-    rate.sleep();
+    ROS_INFO("VERTEX_XY %d %f %f",tag_id, transformStamped.transform.translation.x,transformStamped.transform.translation.y);
+   rate.sleep();
   }
   return 0;
 };
