@@ -18,7 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 
-# list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/FindEigen.cmake)
 # include_directories(${Eigen_INCLUDE_DIRS})
 # find_package(Eigen REQUIRED)
 find_package(Eigen REQUIRED)
