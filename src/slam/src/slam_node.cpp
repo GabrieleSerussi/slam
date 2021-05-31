@@ -49,7 +49,7 @@ int main(int argc, char** argv){
   ros::NodeHandle n;
 
   ros::Subscriber sub_odom = n.subscribe("odom", 1000, odometryCallback);
-  ros::Subsscriber sub_tag = n.subscribe("tag_detections", 1000, tagCallback);
+  ros::Subscriber sub_tag = n.subscribe("tag_detections", 1000, tagCallback);
 
   tf2_ros::Buffer tfBuffer;
   tf2_ros::TransformListener tfListener(tfBuffer);
