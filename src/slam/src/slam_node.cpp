@@ -5,7 +5,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <math.h>
-#include <apriltag_ros/AprilTagDetection.h>
+#include <apriltag_ros/AprilTagDetectionArray.h>
 
 std::vector<float> current(3,0);
 std::vector<float> old(3,0);
@@ -38,9 +38,37 @@ void odometryCallback(const nav_msgs::Odometry::ConstPtr msg) {
     }
   }
 }
-void tagCallback(const apriltag_ros::AprilTagDetection::ConstPtr msg) {
-  tag_id = msg->id[0];
-  ROS_INFO("EDGE_SE2_XY %d %d %f %f", id, tag_id, msg->pose.pose.pose.position.x, msg->pose.pose.pose.position.y);
+/*
+apriltag_ros/ApriTagDetectionArray
+
+std_msgs/Header header
+  uint32 seq
+  time stamp
+  string frame_id
+apriltag_ros/AprilTagDetection[] detections
+  int32[] id
+  float64[] size
+  geometry_msgs/PoseWithCovarianceStamped pose
+    std_msgs/Header header
+      uint32 seq
+      time stamp
+      string frame_id
+    geometry_msgs/PoseWithCovariance pose
+      geometry_msgs/Pose pose
+        geometry_msgs/Point position
+          float64 x
+          float64 y
+          float64 z
+        geometry_msgs/Quaternion orientation
+          float64 x
+          float64 y
+          float64 z
+          float64 w
+      float64[36] covariance
+*/
+void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
+  tag_id = msg->detections[0].id[0];
+  ROS_INFO("EDGE_SE2_XY %d %d %f %f", id, tag_id, msg->detections[0].pose.pose.pose.position.x, msg->detections[0].pose.pose.pose.position.y);
 }
 // voglio la trasformata da fisheye_rect a odom
 int main(int argc, char** argv){
