@@ -80,7 +80,7 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
       int i=1000000000;
       tf2_ros::Buffer tfBuffer;
       tf2_ros::TransformListener tfListener(tfBuffer);
-      Eigen::Transform<float,3,Affine,AutoAlign> t;
+      Eigen::Transform<float,3,Eigen::Affine,Eigen::AutoAlign> t;
       while (i>=0){
         try{
           // DA GUARDARE
