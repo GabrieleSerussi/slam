@@ -13,7 +13,7 @@ std::vector<float> old(3,0);
 int id=1000;
 int tag_id=-1;
 int new_tag_id=-2;
-std::set<int, greater<int>> tags;
+std::set<int> tags;
 ros::NodeHandle n;
 tf2_ros::Buffer tfBuffer;
 tf2_ros::TransformListener tfListener(tfBuffer);
