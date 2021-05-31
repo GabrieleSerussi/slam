@@ -67,8 +67,10 @@ apriltag_ros/AprilTagDetection[] detections
       float64[36] covariance
 */
 void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
-  tag_id = msg->detections[0].id[0];
-  ROS_INFO("EDGE_SE2_XY %d %d %f %f", id, tag_id, msg->detections[0].pose.pose.pose.position.x, msg->detections[0].pose.pose.pose.position.y);
+  if (!msg->detections.empty()){
+    tag_id = msg->detections[0].id[0];
+    ROS_INFO("EDGE_SE2_XY %d %d %f %f", id, tag_id, msg->detections[0].pose.pose.pose.position.x, msg->detections[0].pose.pose.pose.position.y);
+  }
 }
 // voglio la trasformata da fisheye_rect a odom
 int main(int argc, char** argv){
