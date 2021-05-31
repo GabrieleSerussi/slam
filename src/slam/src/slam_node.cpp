@@ -90,7 +90,7 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
           tf2::Matrix3x3 m(q);
           double roll, pitch, yaw;
           m.getRPY(roll, pitch, yaw);
-          t.rotate(AngleAxis(yaw, Eigen::Vector3f::UnitX()));
+          t.rotate(Eigen::AngleAxis(yaw, Eigen::Vector3f::UnitX()));
           // float c = cos(); float s = sin();
           // t.linear() = c, -s, s,  c;
           Eigen::Vector3f point; point << transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z;
