@@ -85,7 +85,8 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
         try{
           // DA GUARDARE
           transformStamped = tfBuffer.lookupTransform("fisheye_rect","odom", ros::Time(0));
-          t.translation() << msg->detections[0].pose.pose.pose.position.x, msg->detections[0].pose.pose.pose.position.y, msg->detections[0].pose.pose.pose.position.z;
+          //t.translation() << msg->detections[0].pose.pose.pose.position.x, msg->detections[0].pose.pose.pose.position.y, msg->detections[0].pose.pose.pose.position.z;
+          t.translation() << transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z;
           tf2::Quaternion q(msg->detections[0].pose.pose.pose.orientation.x, msg->detections[0].pose.pose.pose.orientation.y, msg->detections[0].pose.pose.pose.orientation.z, msg->detections[0].pose.pose.pose.orientation.w);
           tf2::Matrix3x3 m(q);
           double roll, pitch, yaw;
@@ -93,7 +94,8 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
           t.rotate(Eigen::AngleAxis<float>(yaw, Eigen::Vector3f::UnitX()));
           // float c = cos(); float s = sin();
           // t.linear() = c, -s, s,  c;
-          Eigen::Vector3f point; point << transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z;
+          //Eigen::Vector3f point; point << transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z;
+          Eigen::Vector3f point; point << msg->detections[0].pose.pose.pose.position.x, msg->detections[0].pose.pose.pose.position.y, msg->detections[0].pose.pose.pose.position.z;
           Eigen::Vector3f pointw = t*point;
           float xw = pointw.x();
           float yw = pointw.y();
