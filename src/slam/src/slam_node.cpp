@@ -86,7 +86,7 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
           // DA GUARDARE
           transformStamped = tfBuffer.lookupTransform("odom","fisheye_rect", ros::Time(0));
           t.translation() << msg->detections[0].pose.pose.pose.position.x, msg->detections[0].pose.pose.pose.position.y, msg->detections[0].pose.pose.pose.position.z;
-          tf2::Quaternion q(msg->pose.pose.pose.orientation.x, msg->pose.pose.pose.orientation.y, msg->pose.pose.pose.orientation.z, msg->pose.pose.orientation.w);
+          tf2::Quaternion q(msg->detections[0].pose.pose.pose.orientation.x, msg->detections[0].pose.pose.pose.orientation.y, msg->detections[0].pose.pose.pose.orientation.z, msg->detections[0].pose.pose.orientation.w);
           tf2::Matrix3x3 m(q);
           double roll, pitch, yaw;
           m.getRPY(roll, pitch, yaw);
