@@ -14,12 +14,7 @@ int id=1000;
 int tag_id=-1;
 int new_tag_id=-2;
 std::set<int> tags;
-tf2_ros::Buffer tfBuffer;
-tf2_ros::TransformListener tfListener(tfBuffer);
 geometry_msgs::TransformStamped transformStamped;
-
- 
-
 
 void odometryCallback(const nav_msgs::Odometry::ConstPtr msg) {
   
@@ -82,7 +77,10 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
         tags.insert(new_tag_id);
         tag_id = new_tag_id;
         ROS_INFO("EDGE_SE2_XY %d %d %f %f", id, tag_id, msg->detections[0].pose.pose.pose.position.x, msg->detections[0].pose.pose.pose.position.y);
+        
         int i=1000000000;
+        tf2_ros::Buffer tfBuffer;
+        tf2_ros::TransformListener tfListener(tfBuffer);
         while (i>=0){
           try{
             transformStamped = tfBuffer.lookupTransform("odom", "fisheye_rect",
