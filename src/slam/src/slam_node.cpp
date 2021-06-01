@@ -95,7 +95,7 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
           //m.getRPY(roll, pitch, yaw);
           // devo mettere la rotazione della trasformata nella trasformata e dopo moltiplicare la trasformata per il punto fornito da apriltag
           tf2::Vector3 translation = tf2::Vector3(transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z);
-          tf2::Transform::Transform transf = tf2::Transform::Transform(q, translation);
+          tf2::Transform transf = tf2::Transform::Transform(q, translation);
 
 
           
