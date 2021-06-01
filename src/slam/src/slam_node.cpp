@@ -42,9 +42,7 @@ void odometryCallback(const nav_msgs::Odometry::ConstPtr msg) {
     float distance_orientation= current[2]-old[2];
     if(distance_position >= 0.1 || distance_orientation >= 0.5){
       id++;
-      //ROS_INFO("VERTEX_SE2 %d %f %f %f",id, current[0],current[1],current[2]);
       file << "VERTEX_SE2 " << id << " " << current[0] << " " << current[1] << " " << current[2] << "\n";
-      //ROS_INFO("EDGE_SE2 %d %d %f %f %f",id-1, id, current[0]-old[0],current[1]-old[1],current[2]-old[2]);
       file << "EDGE_SE2 " << id-1 << " " << id << " " << current[0]-old[0] << " " << current[1]-old[1] << " " << current[2]-old[2] << "\n";
       old=current;
     }
@@ -99,7 +97,6 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
             tf2::Vector3 pointw = transf*point;
             float xw = pointw.x();
             float yw = pointw.y();
-            //ROS_INFO("VERTEX_XY %d %f %f", new_tag_id, xw ,yw);
             file << "VERTEX_XY " << new_tag_id << " " << xw << " " << yw << "\n";
           }
           catch (tf2::TransformException &ex) {
@@ -108,7 +105,6 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
           tags.insert(new_tag_id);
         }
         tag_id = new_tag_id;
-        //ROS_INFO("EDGE_SE2_XY %d %d %f %f", id, tag_id, msg->detections[i].pose.pose.pose.position.x, msg->detections[i].pose.pose.pose.position.y); 
         file << "EDGE_SE2_XY " << id << " " << tag_id << " " <<  msg->detections[i].pose.pose.pose.position.x << " " << msg->detections[i].pose.pose.pose.position.y << "\n";
       }
     }
