@@ -77,10 +77,10 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
     for(int i=0; i<msg->detections.size(); i++){
       new_tag_id = msg->detections[i].id[0];
       if(!tags.count(new_tag_id)){
-        int i=1000000000;
+        int j=1000000000;
         tf2_ros::Buffer tfBuffer;
         tf2_ros::TransformListener tfListener(tfBuffer);
-        while (i>=0){
+        while (j>=0){
           try{
             transformStamped = tfBuffer.lookupTransform("fisheye_rect","odom", ros::Time(0));
             // devo mettere la rotazione della trasformata nella trasformata e dopo moltiplicare la trasformata per il punto fornito da apriltag
