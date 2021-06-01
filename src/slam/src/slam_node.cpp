@@ -88,7 +88,6 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
             tf2::Vector3 translation = tf2::Vector3(transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z);
             tf2::Transform transf = tf2::Transform(q, translation);
 
-            ROS_INFO("prima del calcolo del punto");
             // posizione del tag rispetto alla fotocamera del robot
             tf2::Vector3 point = tf2::Vector3(msg->detections[i].pose.pose.pose.position.x, msg->detections[i].pose.pose.pose.position.y, msg->detections[i].pose.pose.pose.position.z);
             // posizione del tag rispetto all'odometria
