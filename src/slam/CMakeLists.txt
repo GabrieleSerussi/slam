@@ -24,10 +24,10 @@ find_package(catkin REQUIRED COMPONENTS
 #include_directories(${Eigen_INCLUDE_DIRS})
 #find_package(Eigen REQUIRED)
 
-find_package(cmake_modules REQUIRED)
-find_package(Eigen3 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIR})
-add_definitions(${EIGEN_DEFINITIONS})
+# find_package(cmake_modules REQUIRED)
+# find_package(Eigen3 REQUIRED)
+# include_directories(${EIGEN3_INCLUDE_DIR})
+# add_definitions(${EIGEN_DEFINITIONS})
 
 
 ## System dependencies are found with CMake's conventions

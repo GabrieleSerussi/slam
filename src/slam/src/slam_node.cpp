@@ -75,38 +75,39 @@ apriltag_ros/AprilTagDetection[] detections
 void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
   if (!msg->detections.empty()){  
     for(int i=0; i<msg->detections.size(); i++){
-      new_tag_id = msg->detections[i].id[0];
-      if(!tags.count(new_tag_id)){
-        int j=1000000000;
-        tf2_ros::Buffer tfBuffer;
-        tf2_ros::TransformListener tfListener(tfBuffer);
-        while (j>=0){
-          try{
-            transformStamped = tfBuffer.lookupTransform("fisheye_rect","odom", ros::Time(0));
-            // devo mettere la rotazione della trasformata nella trasformata e dopo moltiplicare la trasformata per il punto fornito da apriltag
-            tf2::Quaternion q = tf2::Quaternion(transformStamped.transform.rotation.x, transformStamped.transform.rotation.y, transformStamped.transform.rotation.z, transformStamped.transform.rotation.w);
-            tf2::Vector3 translation = tf2::Vector3(transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z);
-            tf2::Transform transf = tf2::Transform(q, translation);
+      for(int j=0; j<msg->detections[i].id.size(); j++){
+        new_tag_id = msg->detections[i].id[j];
+        if(!tags.count(new_tag_id)){
+          int k=1000000000;
+          tf2_ros::Buffer tfBuffer;
+          tf2_ros::TransformListener tfListener(tfBuffer);
+          while (k>=0){
+            try{
+              transformStamped = tfBuffer.lookupTransform("fisheye_rect","odom", ros::Time(0));
+              // devo mettere la rotazione della trasformata nella trasformata e dopo moltiplicare la trasformata per il punto fornito da apriltag
+              tf2::Quaternion q = tf2::Quaternion(transformStamped.transform.rotation.x, transformStamped.transform.rotation.y, transformStamped.transform.rotation.z, transformStamped.transform.rotation.w);
+              tf2::Vector3 translation = tf2::Vector3(transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z);
+              tf2::Transform transf = tf2::Transform(q, translation);
 
-            // posizione del tag rispetto alla fotocamera del robot
-            tf2::Vector3 point = tf2::Vector3(msg->detections[i].pose.pose.pose.position.x, msg->detections[i].pose.pose.pose.position.y, msg->detections[i].pose.pose.pose.position.z);
-            // posizione del tag rispetto all'odometria
-            tf2::Vector3 pointw = transf*point;
-            float xw = pointw.x();
-            float yw = pointw.y();
-            ROS_INFO("VERTEX_XY %d %f %f", new_tag_id, xw ,yw);
-            break;
+              // posizione del tag rispetto alla fotocamera del robot
+              tf2::Vector3 point = tf2::Vector3(msg->detections[i].pose.pose.pose.position.x, msg->detections[i].pose.pose.pose.position.y, msg->detections[i].pose.pose.pose.position.z);
+              // posizione del tag rispetto all'odometria
+              tf2::Vector3 pointw = transf*point;
+              float xw = pointw.x();
+              float yw = pointw.y();
+              ROS_INFO("VERTEX_XY %d %f %f", new_tag_id, xw ,yw);
+              break;
+            }
+            catch (tf2::TransformException &ex) {
+              ROS_WARN("%s",ex.what());
+              ros::Duration(1.0).sleep();
+            }
+            k--; 
           }
-          catch (tf2::TransformException &ex) {
-            ROS_WARN("%s",ex.what());
-            ros::Duration(1.0).sleep();
-          }
-          j--; 
+          tags.insert(new_tag_id);
         }
-        tags.insert(new_tag_id);
-      }
-      tag_id = new_tag_id;
-      ROS_INFO("EDGE_SE2_XY %d %d %f %f", id, tag_id, msg->detections[i].pose.pose.pose.position.x, msg->detections[i].pose.pose.pose.position.y); 
+        tag_id = new_tag_id;
+        ROS_INFO("EDGE_SE2_XY %d %d %f %f", id, tag_id, msg->detections[i].pose.pose.pose.position.x, msg->detections[i].pose.pose.pose.position.y); 
     }
   }
 }
