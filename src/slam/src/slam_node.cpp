@@ -7,9 +7,6 @@
 #include <math.h>
 #include <apriltag_ros/AprilTagDetectionArray.h>
 #include <set>
-//#include <Eigen/Geometry>
-//#include <Eigen/Core>
-//#include <tf2/Vector3.h>
 #include <tf2/LinearMath/Transform.h>
 
 std::vector<float> current(3,0);
@@ -25,8 +22,9 @@ void odometryCallback(const nav_msgs::Odometry::ConstPtr msg) {
   tf2::Quaternion q(msg->pose.pose.orientation.x, msg->pose.pose.orientation.y, msg->pose.pose.orientation.z, msg->pose.pose.orientation.w);
   tf2::Matrix3x3 m(q);
   double roll, pitch, yaw;
+  // restituisce un angolo in radianti compreso tra -π e π
   m.getRPY(roll, pitch, yaw);
-
+  // il messaggio fornisce la posizione in metri
   current[0]=msg->pose.pose.position.x;
   current[1]=msg->pose.pose.position.y;
   current[2]=yaw;
@@ -76,46 +74,24 @@ apriltag_ros/AprilTagDetection[] detections
 */
 void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
   if (!msg->detections.empty()){  
-    // RICORDATI DI FARE UN CICLO SUGLI ID
     for(int i=0; i<msg->detections.size(); i++){
       new_tag_id = msg->detections[i].id[0];
       if(!tags.count(new_tag_id)){
         int i=1000000000;
         tf2_ros::Buffer tfBuffer;
         tf2_ros::TransformListener tfListener(tfBuffer);
-        //Eigen::Transform<float,3,Eigen::Affine,Eigen::AutoAlign> t;
         while (i>=0){
           try{
-            // DA GUARDARE
             transformStamped = tfBuffer.lookupTransform("fisheye_rect","odom", ros::Time(0));
-            //t.translation() << msg->detections[0].pose.pose.pose.position.x, msg->detections[0].pose.pose.pose.position.y, msg->detections[0].pose.pose.pose.position.z;
-            //t.translation() << transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z;
-            tf2::Quaternion q = tf2::Quaternion(transformStamped.transform.rotation.x, transformStamped.transform.rotation.y, transformStamped.transform.rotation.z, transformStamped.transform.rotation.w);
-            //tf2::Matrix3x3 m(q);
-            //double roll, pitch, yaw;
-            //m.getRPY(roll, pitch, yaw);
             // devo mettere la rotazione della trasformata nella trasformata e dopo moltiplicare la trasformata per il punto fornito da apriltag
+            tf2::Quaternion q = tf2::Quaternion(transformStamped.transform.rotation.x, transformStamped.transform.rotation.y, transformStamped.transform.rotation.z, transformStamped.transform.rotation.w);
             tf2::Vector3 translation = tf2::Vector3(transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z);
             tf2::Transform transf = tf2::Transform(q, translation);
 
-
-            
-            // tf2::Quaternion q(msg->detections[0].pose.pose.pose.orientation.x, msg->detections[0].pose.pose.pose.orientation.y, msg->detections[0].pose.pose.pose.orientation.z, msg->detections[0].pose.pose.pose.orientation.w);
-            // tf2::Matrix3x3 m(q);
-            // double roll, pitch, yaw;
-            // m.getRPY(roll, pitch, yaw);
-            // t.rotate(Eigen::AngleAxis<float>(yaw, Eigen::Vector3f::UnitX()));
-            // 
-            // float c = cos(); float s = sin();
-            // t.linear() = c, -s, s,  c;
-            //Eigen::Vector3f point; point << transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z;
-            //Eigen::Vector3f point; point << msg->detections[0].pose.pose.pose.position.x, msg->detections[0].pose.pose.pose.position.y, msg->detections[0].pose.pose.pose.position.z;
-            //Eigen::Vector3f pointw = t*point;
-            tf2::Vector3 point = tf2::Vector3(transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z);
+            tf2::Vector3 point = tf2::Vector3(msg->detections[i].pose.pose.pose.position.x, msg->detections[i].pose.pose.pose.position.y, msg->detections[i].pose.pose.pose.position.z);
             tf2::Vector3 pointw = transf*point;
             float xw = pointw.x();
             float yw = pointw.y();
-            // perché yw è sempre 0?
             ROS_INFO("VERTEX_XY %d %f %f", new_tag_id, xw ,yw);
             break;
           }
@@ -132,22 +108,16 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
     }
   }
 }
-// voglio la trasformata da fisheye_rect a odom
 int main(int argc, char** argv){
   ros::init(argc, argv, "slam_node");
   ros::NodeHandle n;
-  
-
   ros::Subscriber sub_odom = n.subscribe("odom", 1000, odometryCallback);
   ros::Subscriber sub_tag = n.subscribe("tag_detections", 1000, tagCallback);
 
    ros::Rate rate(10.0);
   while (n.ok()){
     ros::spinOnce();
-    
-
-    
-   rate.sleep();
+    rate.sleep();
   }
   return 0;
 };
