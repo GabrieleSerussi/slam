@@ -101,7 +101,7 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
             ROS_WARN("%s",ex.what());
             ros::Duration(1.0).sleep();
           }
-          i--; 
+          j--; 
         }
         tags.insert(new_tag_id);
       }
