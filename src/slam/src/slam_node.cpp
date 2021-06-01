@@ -78,12 +78,12 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
       for(int j=0; j<msg->detections[i].id.size(); j++){
         new_tag_id = msg->detections[i].id[j];
         if(!tags.count(new_tag_id)){
-          int k=1000000000;
+          //int k=1000000000;
           tf2_ros::Buffer tfBuffer;
           tf2_ros::TransformListener tfListener(tfBuffer);
-          while (k>=0){
+          //while (k>=0){
             try{
-              transformStamped = tfBuffer.lookupTransform("fisheye_rect","odom", ros::Time(0));
+              transformStamped = tfBuffer.lookupTransform("fisheye_rect","odom", ros::Time(0), ros::Duration(3.0));
               // devo mettere la rotazione della trasformata nella trasformata e dopo moltiplicare la trasformata per il punto fornito da apriltag
               tf2::Quaternion q = tf2::Quaternion(transformStamped.transform.rotation.x, transformStamped.transform.rotation.y, transformStamped.transform.rotation.z, transformStamped.transform.rotation.w);
               tf2::Vector3 translation = tf2::Vector3(transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z);
@@ -102,8 +102,8 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
               ROS_WARN("%s",ex.what());
               ros::Duration(1.0).sleep();
             }
-            k--; 
-          }
+            //k--; 
+          //}
           tags.insert(new_tag_id);
         }
         tag_id = new_tag_id;
