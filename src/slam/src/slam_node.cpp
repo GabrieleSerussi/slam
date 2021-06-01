@@ -108,6 +108,7 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
         }
         tag_id = new_tag_id;
         ROS_INFO("EDGE_SE2_XY %d %d %f %f", id, tag_id, msg->detections[i].pose.pose.pose.position.x, msg->detections[i].pose.pose.pose.position.y); 
+      }
     }
   }
 }
