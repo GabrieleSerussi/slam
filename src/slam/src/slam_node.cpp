@@ -87,14 +87,20 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
           try{
             transformStamped = tfBuffer.lookupTransform("odom","fisheye_rect", ros::Time(0), ros::Duration(3.0));
             // devo mettere la rotazione della trasformata nella trasformata e dopo moltiplicare la trasformata per il punto fornito da apriltag
-            tf2::Quaternion q = tf2::Quaternion(transformStamped.transform.rotation.x, transformStamped.transform.rotation.y, transformStamped.transform.rotation.z, transformStamped.transform.rotation.w);
+            //tf2::Quaternion q = tf2::Quaternion(transformStamped.transform.rotation.x, transformStamped.transform.rotation.y, transformStamped.transform.rotation.z, transformStamped.transform.rotation.w);
+            tf2::Quaternion q; tf2::convert(transformStamped.transform.rotation, q);
             tf2::Vector3 translation = tf2::Vector3(transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z);
-            tf2::Transform transf = tf2::Transform(q, translation);
+            tf2::Transform transf_camera2odom = tf2::Transform(q, translation);
+
+            // trasformata dalla posizione corrente alla posizione vecchia
+            tf2::Vector3 vec = tf2::Vector3(current[0]-old[0], current[1]-old[1], 0);
+            tf2::Quaternion quat; quat.setRPY(0,0,current[2]-old[2]);
+            tf2::Transform transf_current2old = tf2::Transform(quat, vec);
 
             // posizione del tag rispetto alla fotocamera del robot
             tf2::Vector3 point = tf2::Vector3(msg->detections[i].pose.pose.pose.position.x, msg->detections[i].pose.pose.pose.position.y, msg->detections[i].pose.pose.pose.position.z);
             // posizione del tag rispetto all'odometria
-            tf2::Vector3 pointw = transf*point;
+            tf2::Vector3 pointw = transf2_current2old*transf_camera2odom*point;
             float xw = pointw.x();
             float yw = pointw.y();
             file << "VERTEX_XY " << new_tag_id << " " << xw << " " << yw << "\n";
