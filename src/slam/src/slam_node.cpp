@@ -100,7 +100,7 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
             // posizione del tag rispetto alla fotocamera del robot
             tf2::Vector3 point = tf2::Vector3(msg->detections[i].pose.pose.pose.position.x, msg->detections[i].pose.pose.pose.position.y, msg->detections[i].pose.pose.pose.position.z);
             // posizione del tag rispetto all'odometria
-            tf2::Vector3 pointw = transf2_current2old*transf_camera2odom*point;
+            tf2::Vector3 pointw = transf_current2old*transf_camera2odom*point;
             float xw = pointw.x();
             float yw = pointw.y();
             file << "VERTEX_XY " << new_tag_id << " " << xw << " " << yw << "\n";
