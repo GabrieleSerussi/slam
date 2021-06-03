@@ -25,7 +25,7 @@ void odometryCallback(const nav_msgs::Odometry::ConstPtr msg) {
   
   tf2::Quaternion q(msg->pose.pose.orientation.x, msg->pose.pose.orientation.y, msg->pose.pose.orientation.z, msg->pose.pose.orientation.w);
   // restituisce un angolo in radianti compreso tra -π e π
-  double roll, pitch, yaw; q.getRPY(roll, pitch, yaw);
+  double roll, pitch, yaw; tf2::Matrix3x3 m(q); m.getRPY(roll, pitch, yaw);
   // il messaggio fornisce la posizione in metri
   current[0]=msg->pose.pose.position.x; current[1]=msg->pose.pose.position.y; current[2]=yaw;
 
