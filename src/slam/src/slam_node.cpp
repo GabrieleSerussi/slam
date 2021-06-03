@@ -14,7 +14,7 @@
 std::ofstream file; 
 
 std::vector<float> current(3,0);
-std::vector<float> old(3,0);
+std::vector<float> old;
 int id=1000;
 int tag_id=-1;
 int new_tag_id=-2;
@@ -24,23 +24,19 @@ geometry_msgs::TransformStamped transformStamped;
 void odometryCallback(const nav_msgs::Odometry::ConstPtr msg) {
   
   tf2::Quaternion q(msg->pose.pose.orientation.x, msg->pose.pose.orientation.y, msg->pose.pose.orientation.z, msg->pose.pose.orientation.w);
-  tf2::Matrix3x3 m(q);
-  double roll, pitch, yaw;
   // restituisce un angolo in radianti compreso tra -π e π
-  m.getRPY(roll, pitch, yaw);
+  double roll, pitch, yaw; q.getRPY(roll, pitch, yaw);
   // il messaggio fornisce la posizione in metri
-  current[0]=msg->pose.pose.position.x;
-  current[1]=msg->pose.pose.position.y;
-  current[2]=yaw;
+  current[0]=msg->pose.pose.position.x; current[1]=msg->pose.pose.position.y; current[2]=yaw;
 
-  if(old[0]==0 && old[1]==0 && old[2]==0){
+  if(old.empty()){
     old=current;
     file << "VERTEX_SE2 " << id << " " << current[0] << " " << current[1] << " " << current[2] << "\n";
   }
   else{
-    float distance_position= sqrt(pow(current[0]-old[0],2)+pow(current[1]-old[1],2));
-    float distance_orientation= current[2]-old[2];
-    if(distance_position >= 0.1 || distance_orientation >= 0.5){
+    float traslation= sqrt(pow(current[0]-old[0],2)+pow(current[1]-old[1],2));
+    float rotation= current[2]-old[2];
+    if(traslation >= 0.1 || rotation >= 0.5){
       id++;
       file << "VERTEX_SE2 " << id << " " << current[0] << " " << current[1] << " " << current[2] << "\n";
       file << "EDGE_SE2 " << id-1 << " " << id << " " << current[0]-old[0] << " " << current[1]-old[1] << " " << current[2]-old[2] << "\n";
@@ -95,7 +91,7 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
             tf2::Vector3 translation = tf2::Vector3(transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z);
             tf2::Transform transf_camera2odom = tf2::Transform(q, translation);
 
-            // posizione del tag rispetto all'odometria nella posizione vecchia (eventualmente coincidente con quella corrente)
+            // posizione del tag rispetto all'odometria
             tf2::Vector3 pointw = transf_camera2odom*point;
             float xw = pointw.x();
             float yw = pointw.y();
