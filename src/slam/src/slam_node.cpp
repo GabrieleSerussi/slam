@@ -21,7 +21,7 @@ int new_tag_id=-2;
 std::set<int> tags;
 geometry_msgs::TransformStamped transformStamped;
 
-void odometryCallback(const nav_msgs::Odometry::ConstPtr msg) {
+void positionCallback(const nav_msgs::Odometry::ConstPtr msg) {
   
   tf2::Quaternion q(msg->pose.pose.orientation.x, msg->pose.pose.orientation.y, msg->pose.pose.orientation.z, msg->pose.pose.orientation.w);
   // restituisce un angolo in radianti compreso tra -π e π
@@ -120,7 +120,7 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
 int main(int argc, char** argv){
   ros::init(argc, argv, "slam_node");
   ros::NodeHandle n;
-  ros::Subscriber sub_odom = n.subscribe("odom", 1000, odometryCallback);
+  ros::Subscriber sub_odom = n.subscribe("odom", 1000, positionCallback);
   ros::Subscriber sub_tag = n.subscribe("tag_detections", 1000, tagCallback);
 
   file.open("out.g2o");
