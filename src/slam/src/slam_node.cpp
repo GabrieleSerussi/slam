@@ -87,9 +87,9 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
           try{
             // prendo la trasformata dalla fotocamera a odom
             transformStamped = tfBuffer.lookupTransform("odom","fisheye_rect", ros::Time(0), ros::Duration(3.0));
-            tf2::Quaternion q = tf2::Quaternion(transformStamped.transform.rotation.x, transformStamped.transform.rotation.y, transformStamped.transform.rotation.z, transformStamped.transform.rotation.w);
-            tf2::Vector3 translation = tf2::Vector3(transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z);
-            tf2::Transform transf_camera2odom = tf2::Transform(q, translation);
+            tf2::Quaternion R = tf2::Quaternion(transformStamped.transform.rotation.x, transformStamped.transform.rotation.y, transformStamped.transform.rotation.z, transformStamped.transform.rotation.w);
+            tf2::Vector3 t = tf2::Vector3(transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z);
+            tf2::Transform transf_camera2odom = tf2::Transform(R, t);
 
             // posizione del tag rispetto all'odometria
             tf2::Vector3 pointw = transf_camera2odom*point;
