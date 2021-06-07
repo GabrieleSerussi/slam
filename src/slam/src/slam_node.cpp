@@ -103,7 +103,7 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
           tags.insert(new_tag_id);
         }
         tag_id = new_tag_id;
-        /*
+        
         // trasformata dalla posizione corrente alla posizione vecchia
         tf2::Vector3 vec = tf2::Vector3(current[0]-old[0], current[1]-old[1], 0);
         tf2::Quaternion quat; quat.setRPY(0,0,current[2]-old[2]);
@@ -112,9 +112,11 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
         tf2::Vector3 pointr = transf_current2old * point;
         float xr = pointr.x();
         float yr = pointr.y();
-        */
+        
+       /*
        float xr = point.x();
        float yr = point.y();
+       */
 
         file << "EDGE_SE2_XY " << id << " " << tag_id << " " << xr << " " << yr << "\n";
       }
