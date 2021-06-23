@@ -88,7 +88,7 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
         // controllo se questo tag sia già presente nell'insieme o meno
         if(!tags.count(new_tag_id)){
           tf2_ros::Buffer tfBuffer;
-          //tf2_ros::TransformListener tfListener(tfBuffer);
+          tf2_ros::TransformListener tfListener(tfBuffer);
 
           try{
             // prendo la trasformata dalla fotocamera a odom
