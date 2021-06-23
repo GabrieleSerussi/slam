@@ -23,12 +23,14 @@ geometry_msgs::TransformStamped transformStamped;
 
 void positionCallback(const nav_msgs::Odometry::ConstPtr msg) {
   
-  tf2::Quaternion q(msg->pose.pose.orientation.x, msg->pose.pose.orientation.y, msg->pose.pose.orientation.z, msg->pose.pose.orientation.w);
+  tf2::Quaternion q(msg->pose.pose.orientation.x, msg->pose.pose.orientation.y, 
+                    msg->pose.pose.orientation.z, msg->pose.pose.orientation.w);
   // restituisce un angolo in radianti compreso tra -π e π
   double roll, pitch, yaw; tf2::Matrix3x3 m(q); m.getRPY(roll, pitch, yaw);
   // il messaggio fornisce la posizione in metri
   current[0]=msg->pose.pose.position.x; current[1]=msg->pose.pose.position.y; current[2]=yaw;
 
+  // se old non è stato inizializzato
   if(old.empty()){
     old=current;
     file << "VERTEX_SE2 " << id << " " << current[0] << " " << current[1] << " " << current[2] << "\n";
@@ -77,12 +79,16 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
     for(int i=0; i<msg->detections.size(); i++){
       for(int j=0; j<msg->detections[i].id.size(); j++){
         new_tag_id = msg->detections[i].id[j];
+
         // posizione del tag rispetto alla fotocamera del robot
-        tf2::Vector3 point = tf2::Vector3(msg->detections[i].pose.pose.pose.position.x, msg->detections[i].pose.pose.pose.position.y, msg->detections[i].pose.pose.pose.position.z);
-      
+        tf2::Vector3 point = tf2::Vector3(msg->detections[i].pose.pose.pose.position.x,
+                                          msg->detections[i].pose.pose.pose.position.y, 
+                                          msg->detections[i].pose.pose.pose.position.z);
+        
+        // controllo se questo tag sia già presente nell'insieme o meno
         if(!tags.count(new_tag_id)){
           tf2_ros::Buffer tfBuffer;
-          tf2_ros::TransformListener tfListener(tfBuffer);
+          //tf2_ros::TransformListener tfListener(tfBuffer);
 
           try{
             // prendo la trasformata dalla fotocamera a odom
@@ -112,11 +118,6 @@ void tagCallback(const apriltag_ros::AprilTagDetectionArray::ConstPtr msg) {
         tf2::Vector3 pointr = transf_current2old * point;
         float xr = pointr.x();
         float yr = pointr.y();
-        
-       /*
-       float xr = point.x();
-       float yr = point.y();
-       */
 
         file << "EDGE_SE2_XY " << id << " " << tag_id << " " << xr << " " << yr << "\n";
       }
